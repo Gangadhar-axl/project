@@ -1,7 +1,13 @@
-// signup.js
+
 
 import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 import clientPromise from "@/lib/dbConfig"; // Adjust the path as needed
+
+async function hashPassword(password) {
+  const saltRounds = 10; // Number of salt rounds
+  return await bcrypt.hash(password, saltRounds);
+}
 
 export async function POST(request) {
   try {
@@ -18,11 +24,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "User already exists" }, { status: 400 });
     }
 
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+
     // Insert the new user into the database
     await db.collection("details").insertOne({
       email,
       phoneNumber,
-      password, // Store password in plain text
+      password: hashedPassword, // Store hashed password in the database
     });
 
     return NextResponse.json({
