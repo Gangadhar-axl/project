@@ -1,20 +1,39 @@
-// app/ui/Signup.jsx
+
 "use client"
 import { useState } from 'react';
-import Link from 'next/link'; // Import Link from Next.js
-import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function SignupForm() {
   const [email, setEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
-  //const router = useRouter();
+  const router = useRouter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    // Redirect to login page after successful signup
-    router.push('/login');
+    console.log("hii");
+
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, phoneNumber, password }),
+      });
+      console.log(response);
+
+      if (response.ok) {
+      console.log(response);
+
+        router.push('/login');
+      } else {
+        console.error('Failed to sign up:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error signing up:', error);
+    }
   };
 
   return (
